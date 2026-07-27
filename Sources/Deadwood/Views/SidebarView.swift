@@ -51,25 +51,37 @@ struct SidebarView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            scanButton
+            sidebarActions
         }
     }
 
-    private var scanButton: some View {
+    private var sidebarActions: some View {
         VStack(spacing: 0) {
             Divider()
-            Button {
-                model.scanSelectedTarget()
-            } label: {
-                Label(
-                    model.selectedTarget.map { "Scan \($0.displayName)" } ?? "Scan",
-                    systemImage: "play.fill"
-                )
-                .frame(maxWidth: .infinity)
+            VStack(spacing: 8) {
+                Button {
+                    model.scanSelectedTarget()
+                } label: {
+                    Label(
+                        model.selectedTarget.map { "Scan \($0.displayName)" } ?? "Scan",
+                        systemImage: "play.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(model.selectedTarget == nil || model.isScanning)
+
+                Button {
+                    FileActions.openSupportPage()
+                } label: {
+                    Label("Donate", systemImage: "heart.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Color(red: 232 / 255, green: 58 / 255, blue: 0))
+                .help("Support Deadwood with cryptocurrency")
             }
             .controlSize(.large)
-            .buttonStyle(.borderedProminent)
-            .disabled(model.selectedTarget == nil || model.isScanning)
             .padding(12)
         }
         .background(Color(nsColor: .windowBackgroundColor))

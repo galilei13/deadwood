@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Support Deadwood, the free and open-source disk space analyzer for macOS.">
+  <meta name="theme-color" content="#111617">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Support Deadwood</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./support-config.js" defer></script>
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#support">Skip to donation options</a>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Deadwood support home">
+      <span class="brand-mark" aria-hidden="true">
+        <span></span>
+      </span>
+      <span>Deadwood</span>
+    </a>
+    <a class="github-link" href="https://github.com/galilei13/deadwood">
+      View source
+      <span aria-hidden="true">↗</span>
+    </a>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Independent macOS utility</p>
+        <h1 id="hero-title">Keep Deadwood<br><em>growing.</em></h1>
+        <p class="lede">
+          Deadwood is free, open source, and built without tracking.
+          If it helped you reclaim space or save time, you can help fund its maintenance.
+        </p>
+        <div class="promise">
+          <span class="promise-dot" aria-hidden="true"></span>
+          Donations are optional. Every feature stays available to everyone.
+        </div>
+      </div>
+
+      <div class="storage-rings" aria-hidden="true">
+        <div class="ring ring-one"></div>
+        <div class="ring ring-two"></div>
+        <div class="ring ring-three"></div>
+        <div class="ring-core">
+          <span>100%</span>
+          <small>community<br>powered</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="support-section" id="support" aria-labelledby="support-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Direct support</p>
+          <h2 id="support-title">Choose a network</h2>
+        </div>
+        <p>Send only the asset shown on the matching network.</p>
+      </div>
+
+      <div class="wallet-grid" id="wallet-list" aria-live="polite"></div>
+
+      <aside class="safety-note">
+        <span class="safety-icon" aria-hidden="true">!</span>
+        <div>
+          <h3>Check before you send</h3>
+          <p>
+            Crypto transfers cannot be reversed. Verify the network and the full address in your wallet.
+            Deadwood will never ask for your seed phrase or private key.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="other-support" aria-labelledby="other-title">
+      <div>
+        <p class="eyebrow">No wallet needed</p>
+        <h2 id="other-title">Help without donating</h2>
+      </div>
+      <div class="support-links">
+        <a href="https://github.com/galilei13/deadwood">
+          <span>Star the project</span>
+          <small>Help more macOS users find it</small>
+        </a>
+        <a href="https://github.com/galilei13/deadwood/issues">
+          <span>Report an issue</span>
+          <small>Make the next release more reliable</small>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Deadwood is released under the MIT License.</span>
+    <span>Built in the open.</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">Address copied</div>
+</body>
+</html>

@@ -108,6 +108,14 @@ Design notes:
 - APFS clone files are counted at full size for each clone.
 - Changing scan options applies to the next scan, not retroactively.
 
+## Support
+
+The sidebar's **Donate** button opens the project's
+[crypto support page](https://galilei13.github.io/deadwood/). Donation addresses
+are configured in [`docs/support-config.js`](docs/support-config.js); verify every
+address and network before publishing it. Donations are optional and do not unlock
+features.
+
 ## License
 
 [MIT](LICENSE)
