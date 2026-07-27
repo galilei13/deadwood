@@ -16,15 +16,18 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 - [x] Verify the local ad-hoc code signature.
 - [x] Ship and document the official `1.0.0` build as Apple Silicon `arm64` only.
 - [x] Document that `1.0.0` is ad-hoc signed and not Apple-notarized.
-- [ ] Build `Deadwood-1.0.0.dmg`.
-- [ ] Verify the final artifacts:
+- [x] Build the local `Deadwood-1.0.0.dmg` release candidate.
+- [x] Verify the mounted release candidate, app metadata, architecture, ad-hoc
+  signature, icon, Applications link, disk-image integrity, and SHA-256 checksum:
 
   ```bash
   test "$(lipo -archs dist/Deadwood.app/Contents/MacOS/Deadwood)" = "arm64"
   codesign --verify --deep --strict --verbose=2 dist/Deadwood.app
+  hdiutil verify dist/Deadwood-1.0.0.dmg
   shasum -a 256 dist/Deadwood-1.0.0.dmg
   ```
 
+- [ ] Rebuild and verify the final DMG after completing manual QA.
 - [ ] Verify the documented **Open Anyway** flow on a clean macOS user account.
 - [ ] Download the uploaded DMG and install it on a clean macOS user account.
 
