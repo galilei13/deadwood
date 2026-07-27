@@ -48,7 +48,8 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 
 - [x] Add the in-app Donate button and static support page.
 - [x] Add the GitHub funding link.
-- [ ] Add and independently verify each public wallet address and network.
+- [x] Add the four public wallet addresses, exact asset/network labels, and validated QR codes.
+- [ ] Confirm ownership and receipt with a small test transfer on every network.
 - [ ] Test address copying on desktop and mobile browsers.
 - [ ] Publish the GitHub Pages site and test the in-app Donate link.
 

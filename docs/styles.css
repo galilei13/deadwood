@@ -331,9 +331,18 @@ h2 {
   font-weight: 850;
 }
 
-.wallet-card:nth-child(2) .coin {
-  color: var(--ink);
-  background: var(--moss);
+.wallet-card[data-symbol="BNB"] .coin {
+  background: #f3ba2f;
+}
+
+.wallet-card[data-symbol="USDT"] .coin {
+  color: white;
+  background: #26a17b;
+}
+
+.wallet-card[data-symbol="POL"] .coin {
+  color: white;
+  background: #8247e5;
 }
 
 .wallet-state {
@@ -361,6 +370,23 @@ h2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 9px;
+}
+
+.wallet-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  align-items: end;
+  gap: 14px;
+}
+
+.wallet-qr {
+  width: 112px;
+  height: 112px;
+  padding: 7px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  image-rendering: pixelated;
 }
 
 .address {
@@ -569,6 +595,10 @@ footer {
   }
 
   .address-row {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-details {
     grid-template-columns: 1fr;
   }
 

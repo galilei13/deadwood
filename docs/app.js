@@ -24,6 +24,7 @@ function walletCard(wallet) {
   const hasAddress = Boolean(wallet.address?.trim());
   const article = document.createElement("article");
   article.className = "wallet-card";
+  article.dataset.symbol = wallet.symbol;
 
   const top = document.createElement("div");
   top.className = "wallet-top";
@@ -65,7 +66,23 @@ function walletCard(wallet) {
   copy.addEventListener("click", () => copyAddress(wallet.address));
 
   row.append(address, copy);
-  article.append(top, name, network, row);
+
+  const details = document.createElement("div");
+  details.className = "wallet-details";
+  details.append(row);
+
+  if (hasAddress && wallet.qr) {
+    const qr = document.createElement("img");
+    qr.className = "wallet-qr";
+    qr.src = wallet.qr;
+    qr.width = 112;
+    qr.height = 112;
+    qr.loading = "lazy";
+    qr.alt = `QR code for the ${wallet.name} address on ${wallet.network}`;
+    details.append(qr);
+  }
+
+  article.append(top, name, network, details);
   return article;
 }
 
