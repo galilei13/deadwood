@@ -14,7 +14,7 @@ Deadwood is a fast, native macOS disk-space analyzer built with SwiftUI. Scan an
 
 ## Features
 
-- **Parallel scanner** — walks directories concurrently with structured concurrency; typically 50–100k items/second. Progress (items, bytes, current path, elapsed) streams live while you wait, and scans cancel instantly.
+- **Parallel scanner** — walks directories concurrently with structured concurrency and bounded filesystem workers. Progress (items, bytes, current path, elapsed) streams live while you wait, and cancellation is checked between directory reads and while processing large listings.
 - **Tree view** — a native hierarchical `Table` with sortable columns: name, size, % of parent (with bar), item count, date modified, and kind. Real Finder file icons included.
 - **Treemap view** — a squarified treemap of the scanned tree. Hover for details, click to select, double-click to drill into a folder, and climb back out with the breadcrumb.
 - **Largest Files view** — the top 100 space consumers in one flat, ranked list.
@@ -28,7 +28,8 @@ Deadwood is a fast, native macOS disk-space analyzer built with SwiftUI. Scan an
 
 Grab `Deadwood-x.y.z.dmg` from [Releases](../../releases), open it, and drag Deadwood into Applications.
 
-The app is ad-hoc signed (not notarized), so on first launch use right-click → Open.
+Local builds are ad-hoc signed by default. Release builds can be Developer ID
+signed and notarized using the environment variables documented below.
 
 ## Build from source
 
@@ -38,8 +39,22 @@ Requirements: macOS 14 (Sonoma) or later, Xcode Command Line Tools (`xcode-selec
 swift run                  # quick development run
 ./build-app.sh             # dist/Deadwood.app (release, icon, ad-hoc signed)
 ./scripts/make-dmg.sh      # dist/Deadwood-2.0.0.dmg installer
-./scripts/run-smoke-tests.sh   # scanner + treemap smoke tests
+swift test                 # scanner + treemap test suite
 ```
+
+`VERSION` is the single source of truth for the app and DMG version. To create
+a distributable signed and notarized installer:
+
+```bash
+export DEADWOOD_SIGNING_IDENTITY="Developer ID Application: Your Name (TEAMID)"
+export DEADWOOD_NOTARY_PROFILE="deadwood-notary"
+./build-app.sh
+./scripts/make-dmg.sh
+```
+
+The notary profile must already exist in Keychain (created with
+`xcrun notarytool store-credentials`). CI builds and tests every push and pull
+request on a GitHub-hosted macOS runner.
 
 ## Usage
 

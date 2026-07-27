@@ -4,12 +4,28 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION="2.0.0"
+VERSION="$(tr -d '[:space:]' < VERSION)"
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "Invalid version in VERSION: $VERSION" >&2
+    exit 1
+fi
+
 APP="dist/Deadwood.app"
 DMG="dist/Deadwood-${VERSION}.dmg"
 VOLNAME="Deadwood"
-STAGING="$(mktemp -d)/Deadwood"
-RW_DMG="$(mktemp -d)/rw.dmg"
+WORK_DIR="$(mktemp -d)"
+STAGING="$WORK_DIR/staging"
+RW_DMG="$WORK_DIR/rw.dmg"
+MOUNT_DIR="/Volumes/$VOLNAME"
+MOUNTED=0
+
+cleanup() {
+    if [ "$MOUNTED" -eq 1 ]; then
+        hdiutil detach "$MOUNT_DIR" > /dev/null 2>&1 || true
+    fi
+    rm -rf "$WORK_DIR"
+}
+trap cleanup EXIT
 
 if [ ! -d "$APP" ]; then
     ./build-app.sh
@@ -32,8 +48,16 @@ hdiutil create -srcfolder "$STAGING" -volname "$VOLNAME" -fs HFS+ \
     -format UDRW -size 80m "$RW_DMG" > /dev/null
 
 echo "Styling DMG window..."
-MOUNT_DIR="/Volumes/$VOLNAME"
-hdiutil attach "$RW_DMG" -readwrite -noverify -noautoopen > /dev/null
+if [ -e "$MOUNT_DIR" ]; then
+    echo "Refusing to mount: $MOUNT_DIR already exists." >&2
+    exit 1
+fi
+hdiutil attach "$RW_DMG" \
+    -readwrite \
+    -noverify \
+    -noautoopen \
+    -mountpoint "$MOUNT_DIR" > /dev/null
+MOUNTED=1
 sleep 1
 
 # Window content: 640x400 pt (matches the background image), +28 pt titlebar.
@@ -63,11 +87,22 @@ EOF
 
 sync
 hdiutil detach "$MOUNT_DIR" > /dev/null
+MOUNTED=0
 
 echo "Compressing..."
 rm -f "$DMG"
 hdiutil convert "$RW_DMG" -format UDZO -imagekey zlib-level=9 -o "$DMG" > /dev/null
-rm -f "$RW_DMG"
+
+if [ -n "${DEADWOOD_NOTARY_PROFILE:-}" ]; then
+    echo "Submitting DMG for notarization..."
+    xcrun notarytool submit "$DMG" \
+        --keychain-profile "$DEADWOOD_NOTARY_PROFILE" \
+        --wait
+    xcrun stapler staple "$DMG"
+    echo "Notarization ticket stapled."
+else
+    echo "Skipping notarization (DEADWOOD_NOTARY_PROFILE is not set)."
+fi
 
 echo ""
 echo "Done! Installer created at: $DMG"
