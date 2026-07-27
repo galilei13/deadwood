@@ -7,7 +7,7 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 - [x] Set the marketing version to `1.0.0`.
 - [x] Add the copyright owner and MIT license to the app metadata.
 - [x] Include the MIT license in the repository.
-- [ ] Choose and freeze the bundle identifier before Developer ID signing.
+- [x] Freeze the bundle identifier as `io.github.galilei13.deadwood`.
 - [ ] Replace the current app icon and verify it at 16, 32, 128, 256, 512, and 1024 px.
 
 ## Build and distribution
