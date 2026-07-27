@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build release configuration
+        run: swift build --configuration release
+
+      - name: Run tests
+        run: swift test
+
+      - name: Validate shell scripts
+        run: bash -n build-app.sh scripts/run-smoke-tests.sh scripts/make-dmg.sh

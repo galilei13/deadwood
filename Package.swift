@@ -13,6 +13,11 @@ let package = Package(
         .executableTarget(
             name: "Deadwood",
             path: "Sources/Deadwood"
+        ),
+        .testTarget(
+            name: "DeadwoodTests",
+            dependencies: ["Deadwood"],
+            path: "Tests/DeadwoodTests"
         )
     ]
 )
