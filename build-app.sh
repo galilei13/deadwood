@@ -69,7 +69,7 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << PLIST
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
     <key>NSHumanReadableCopyright</key>
-    <string>MIT License</string>
+    <string>Copyright © 2026 galilei13 and Deadwood contributors. MIT licensed.</string>
     <key>NSDesktopFolderUsageDescription</key>
     <string>Deadwood scans folders you choose to show how disk space is used.</string>
     <key>NSDocumentsFolderUsageDescription</key>

@@ -38,7 +38,7 @@ Requirements: macOS 14 (Sonoma) or later, Xcode Command Line Tools (`xcode-selec
 ```bash
 swift run                  # quick development run
 ./build-app.sh             # dist/Deadwood.app (release, icon, ad-hoc signed)
-./scripts/make-dmg.sh      # dist/Deadwood-2.0.0.dmg installer
+./scripts/make-dmg.sh      # dist/Deadwood-1.0.0.dmg installer
 swift test                 # scanner + treemap test suite
 ```
 
