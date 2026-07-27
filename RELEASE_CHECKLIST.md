@@ -27,6 +27,8 @@ Do not create the `v1.0.0` tag until every required item below is complete.
   shasum -a 256 dist/Deadwood-1.0.0.dmg
   ```
 
+- [x] Install, launch, and smoke-test the release candidate on the current macOS
+  system.
 - [ ] Rebuild and verify the final DMG after completing manual QA.
 - [ ] Verify the documented **Open Anyway** flow on a clean macOS user account.
 - [ ] Download the uploaded DMG and install it on a clean macOS user account.
