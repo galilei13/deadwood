@@ -61,7 +61,7 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 - [ ] Enable GitHub Actions, GitHub Pages, and private vulnerability reporting.
 - [ ] Configure the repository description, topics, social preview, and website URL.
 - [x] Scan tracked files and the full patch history for known secret patterns.
-- [ ] Replace the non-noreply email and non-`blank` name in existing commit metadata, or explicitly accept their public exposure.
+- [x] Rewrite existing commit metadata to use `blank` and the GitHub-provided noreply address.
 
 ## GitHub release
 
