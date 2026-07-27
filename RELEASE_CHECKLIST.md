@@ -14,21 +14,25 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 
 - [x] Build the release configuration successfully.
 - [x] Verify the local ad-hoc code signature.
-- [ ] Build a universal `arm64` + `x86_64` app, or explicitly document Apple Silicon-only support.
-- [ ] Obtain a `Developer ID Application` certificate.
-- [ ] Sign the app with the hardened runtime and a timestamp.
+- [x] Ship and document the official `1.0.0` build as Apple Silicon `arm64` only.
+- [x] Document that `1.0.0` is ad-hoc signed and not Apple-notarized.
 - [ ] Build `Deadwood-1.0.0.dmg`.
-- [ ] Submit the DMG to Apple's notary service and staple the ticket.
 - [ ] Verify the final artifacts:
 
   ```bash
+  test "$(lipo -archs dist/Deadwood.app/Contents/MacOS/Deadwood)" = "arm64"
   codesign --verify --deep --strict --verbose=2 dist/Deadwood.app
-  spctl --assess --type execute --verbose=4 dist/Deadwood.app
-  xcrun stapler validate dist/Deadwood-1.0.0.dmg
   shasum -a 256 dist/Deadwood-1.0.0.dmg
   ```
 
+- [ ] Verify the documented **Open Anyway** flow on a clean macOS user account.
 - [ ] Download the uploaded DMG and install it on a clean macOS user account.
+
+### Future distribution trust (not blocking 1.0.0)
+
+- [ ] Join the Apple Developer Program and obtain a `Developer ID Application` certificate.
+- [ ] Sign a future release with the hardened runtime and a trusted timestamp.
+- [ ] Submit that signed release to Apple's notary service and staple its ticket.
 
 ## Quality
 
@@ -62,5 +66,5 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 - [ ] Write `CHANGELOG.md` and the `1.0.0` release notes.
 - [ ] Merge the release commit into `main`.
 - [ ] Create the annotated `v1.0.0` tag from the exact tested commit.
-- [ ] Create a draft GitHub Release and attach the notarized DMG and SHA-256 checksum.
+- [ ] Create a draft GitHub Release and attach the ad-hoc-signed DMG and SHA-256 checksum.
 - [ ] Re-download and verify the published asset before publishing the release.

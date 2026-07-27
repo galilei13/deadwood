@@ -22,6 +22,13 @@ swift build -c release
 APP_NAME="Deadwood"
 BUILD_DIR=".build/release"
 APP_BUNDLE="dist/${APP_NAME}.app"
+BUILT_ARCHITECTURES="$(lipo -archs "${BUILD_DIR}/${APP_NAME}")"
+
+if [ "$BUILT_ARCHITECTURES" != "arm64" ]; then
+    echo "Release builds must target Apple Silicon only; found: $BUILT_ARCHITECTURES" >&2
+    exit 1
+fi
+echo "Verified Apple Silicon release architecture: arm64"
 
 if [ ! -f "Assets/AppIcon.icns" ]; then
     echo "Generating app icon..."

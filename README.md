@@ -4,7 +4,7 @@
 
 Deadwood is a fast, native macOS disk-space analyzer built with SwiftUI. Scan any drive or folder and see exactly what is eating your storage — in three complementary views — then clear it out safely.
 
-![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-blue) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+![Platform](https://img.shields.io/badge/platform-macOS%2014%2B%20%7C%20Apple%20Silicon-blue) ![Swift](https://img.shields.io/badge/Swift-5.9%2B-orange) ![License](https://img.shields.io/badge/license-MIT-green)
 
 ## Screenshots
 
@@ -28,12 +28,19 @@ Deadwood is a fast, native macOS disk-space analyzer built with SwiftUI. Scan an
 
 Grab `Deadwood-x.y.z.dmg` from [Releases](../../releases), open it, and drag Deadwood into Applications.
 
-Local builds are ad-hoc signed by default. Release builds can be Developer ID
-signed and notarized using the environment variables documented below.
+Deadwood 1.0.0 is built for Apple Silicon Macs (M1 or newer). It is ad-hoc
+signed but not Apple-notarized, so macOS displays a security warning on first
+launch. After verifying the published SHA-256 checksum and trying to open the
+app once, open **System Settings → Privacy & Security** and choose
+**Open Anyway** only if you trust the downloaded release.
+
+Future release builds can be Developer ID signed and notarized using the
+environment variables documented below.
 
 ## Build from source
 
-Requirements: macOS 14 (Sonoma) or later, Xcode Command Line Tools (`xcode-select --install`).
+Requirements: an Apple Silicon Mac, macOS 14 (Sonoma) or later, and Xcode
+Command Line Tools (`xcode-select --install`).
 
 ```bash
 swift run                  # quick development run
