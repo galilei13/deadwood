@@ -57,14 +57,15 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 
 - [x] Document features, source builds, screenshots, limitations, and the MIT license.
 - [ ] Create the public GitHub repository and add its remote.
-- [ ] Add `CONTRIBUTING.md`, `SECURITY.md`, and issue templates.
-- [ ] Enable GitHub Actions and GitHub Pages.
+- [x] Add `CONTRIBUTING.md`, `SECURITY.md`, issue forms, and a pull request template.
+- [ ] Enable GitHub Actions, GitHub Pages, and private vulnerability reporting.
 - [ ] Configure the repository description, topics, social preview, and website URL.
-- [ ] Review every tracked file and the full commit history for sensitive data.
+- [x] Scan tracked files and the full patch history for known secret patterns.
+- [ ] Replace the non-noreply email and non-`blank` name in existing commit metadata, or explicitly accept their public exposure.
 
 ## GitHub release
 
-- [ ] Write `CHANGELOG.md` and the `1.0.0` release notes.
+- [x] Write `CHANGELOG.md` and the `1.0.0` release notes.
 - [ ] Merge the release commit into `main`.
 - [ ] Create the annotated `v1.0.0` tag from the exact tested commit.
 - [ ] Create a draft GitHub Release and attach the ad-hoc-signed DMG and SHA-256 checksum.

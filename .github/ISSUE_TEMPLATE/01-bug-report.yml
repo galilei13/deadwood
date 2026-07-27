@@ -1,0 +1,99 @@
+name: Bug report
+description: Report reproducible incorrect behavior in Deadwood
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Deadwood. Remove personal file names and paths before submitting.
+        For security vulnerabilities, use private vulnerability reporting instead of this form.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem and its impact.
+      placeholder: Deadwood showed or did...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that triggers the problem.
+      placeholder: |
+        1. Select...
+        2. Scan...
+        3. Open...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: dropdown
+    id: scan-target
+    attributes:
+      label: Scan target
+      options:
+        - Internal drive
+        - External drive
+        - Network volume
+        - Selected folder
+        - Not related to scanning
+    validations:
+      required: true
+
+  - type: input
+    id: deadwood-version
+    attributes:
+      label: Deadwood version
+      placeholder: 1.0.0
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: 14.7.6
+    validations:
+      required: true
+
+  - type: dropdown
+    id: chip
+    attributes:
+      label: Apple Silicon chip
+      options:
+        - M1 family
+        - M2 family
+        - M3 family
+        - M4 family
+        - Other Apple Silicon
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add sanitized screenshots or other useful details. Do not upload private files.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues for this problem.
+          required: true
+        - label: I removed personal paths, credentials, private keys, and seed phrases.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

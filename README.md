@@ -123,6 +123,13 @@ are configured in [`docs/support-config.js`](docs/support-config.js); verify eve
 address and network before publishing it. Donations are optional and do not unlock
 features.
 
+## Contributing and security
+
+Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md) for the local
+workflow and pull request expectations. Report suspected vulnerabilities
+privately by following [SECURITY.md](SECURITY.md), not through a public issue.
+Release history is maintained in [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 [MIT](LICENSE)
