@@ -11,3 +11,7 @@ dist/
 *.pfx
 *.mobileprovision
 *.provisionprofile
+
+# Local release working documents
+RELEASE_CHECKLIST.md
+RELEASE_NOTES_*.md
