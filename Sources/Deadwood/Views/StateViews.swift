@@ -129,6 +129,15 @@ struct StatusBarView: View {
                 }
             }
 
+            if model.isSorting {
+                HStack(spacing: 6) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Sorting…")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             if !model.selectedNodes.isEmpty {
                 Text("Selected: \(ByteFormatter.formatCount(model.topLevelSelection.count)) — \(ByteFormatter.format(model.selectedTotalSize))")
                     .foregroundStyle(.secondary)

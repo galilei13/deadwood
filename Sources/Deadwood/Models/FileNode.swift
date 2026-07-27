@@ -102,6 +102,36 @@ final class FileNode: Identifiable, Hashable, @unchecked Sendable {
         sortSubtree(areInOrder: Self.sortClosure(for: comparators))
     }
 
+    /// Sorts the full tree without monopolizing the main actor for the entire
+    /// traversal. A single unusually wide directory still has to be sorted as
+    /// one unit, but large multi-directory trees yield regularly so the app
+    /// can continue rendering and handling input.
+    @MainActor
+    func sortSubtreeIncrementally(
+        by comparators: [KeyPathComparator<FileNode>],
+        yieldEvery directoryCount: Int = 128
+    ) async {
+        let areInOrder = Self.sortClosure(for: comparators)
+        var stack: [FileNode] = [self]
+        var sortedDirectoryCount = 0
+
+        while let node = stack.popLast() {
+            guard !Task.isCancelled else { return }
+            guard var kids = node.children else { continue }
+
+            kids.sort(by: areInOrder)
+            node.children = kids
+            for child in kids where child.children != nil {
+                stack.append(child)
+            }
+
+            sortedDirectoryCount += 1
+            if sortedDirectoryCount.isMultiple(of: max(directoryCount, 1)) {
+                await Task.yield()
+            }
+        }
+    }
+
     private func sortSubtree(areInOrder: (FileNode, FileNode) -> Bool) {
         guard var kids = children else { return }
         kids.sort(by: areInOrder)

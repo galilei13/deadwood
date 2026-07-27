@@ -94,6 +94,7 @@ final class AppModel {
     @ObservationIgnored private var quickLookFollowsSelection = false
     @ObservationIgnored private var isSyncingQuickLook = false
     private(set) var isDeleting = false
+    private(set) var isSorting = false
     /// Bumped whenever the tree's structure changes (scan, sort, deletion) so
     /// layout caches (treemap) know to recompute.
     private(set) var treeVersion = 0
@@ -105,6 +106,8 @@ final class AppModel {
 
     @ObservationIgnored private var scanGeneration = 0
     @ObservationIgnored private var scanTask: Task<Void, Never>?
+    @ObservationIgnored private var sortGeneration = 0
+    @ObservationIgnored private var sortTask: Task<Void, Never>?
     @ObservationIgnored private var volumeObservers: [NSObjectProtocol] = []
 
     private static let recentFoldersKey = "sidebar.recentFolders"
@@ -194,6 +197,8 @@ final class AppModel {
         }
 
         scanTask?.cancel()
+        cancelSort()
+        clearQuickLook()
         addRecentFolder(url)
         phase = .scanning
         progress = ScanProgress()
@@ -230,6 +235,7 @@ final class AppModel {
     }
 
     private func finishScan(with result: ScanResult) {
+        clearQuickLook()
         self.result = result
         largestFiles = result.largestFiles
         treemapRoot = result.root
@@ -240,8 +246,8 @@ final class AppModel {
         phase = .complete
         treeVersion += 1
         // The scanner already delivers every level sorted by size descending.
-        if sortOrder.first != Self.defaultSortOrder.first {
-            result.root.sortSubtree(by: sortOrder)
+        if sortOrder != Self.defaultSortOrder {
+            applySort()
         }
     }
 
@@ -290,8 +296,34 @@ final class AppModel {
     }
 
     func applySort() {
-        result?.root.sortSubtree(by: sortOrder)
-        treeVersion += 1
+        sortTask?.cancel()
+        sortGeneration += 1
+        let generation = sortGeneration
+
+        guard let root = result?.root else {
+            isSorting = false
+            return
+        }
+
+        let comparators = sortOrder
+        isSorting = true
+        sortTask = Task { [weak self] in
+            await root.sortSubtreeIncrementally(by: comparators)
+            guard let self,
+                  !Task.isCancelled,
+                  self.sortGeneration == generation,
+                  self.result?.root === root else { return }
+            self.treeVersion += 1
+            self.isSorting = false
+            self.sortTask = nil
+        }
+    }
+
+    private func cancelSort() {
+        sortTask?.cancel()
+        sortTask = nil
+        sortGeneration += 1
+        isSorting = false
     }
 
     // MARK: - File actions
@@ -361,6 +393,17 @@ final class AppModel {
         isSyncingQuickLook = false
     }
 
+    /// Clears every piece of Quick Look state together so URLs and retained
+    /// nodes from an old tree cannot survive a rescan or deletion.
+    private func clearQuickLook() {
+        isSyncingQuickLook = true
+        quickLookURL = nil
+        quickLookItems = []
+        quickLookContext = []
+        quickLookFollowsSelection = false
+        isSyncingQuickLook = false
+    }
+
     func revealSelectionInFinder() { reveal(selectedNodes) }
     func copySelectionPaths() { copyPaths(selectedNodes) }
     func trashSelection() { trash(selectedNodes) }
@@ -418,7 +461,7 @@ final class AppModel {
     /// Removes a successfully-deleted node from every piece of app state.
     /// Must run before `removeFromParent()` breaks the ancestor chain.
     private func pruneRemovedNode(_ node: FileNode) {
-        largestFiles.removeAll { $0 === node || $0.isDescendant(of: node) }
+        clearQuickLook()
         if let current = treemapRoot, current === node || current.isDescendant(of: node) {
             treemapRoot = node.parent ?? result?.root
         }
@@ -427,8 +470,14 @@ final class AppModel {
             largestFiles = []
             treemapRoot = nil
             phase = .idle
+        } else {
+            node.removeFromParent()
+            if let root = result?.root {
+                // Backfill the ranking after a deletion instead of merely
+                // shrinking what used to be the top 100.
+                largestFiles = DiskScanner.collectLargestLeaves(root: root, count: 100)
+            }
         }
-        node.removeFromParent()
         treeVersion += 1
     }
 }

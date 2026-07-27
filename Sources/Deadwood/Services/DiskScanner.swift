@@ -2,24 +2,31 @@ import Foundation
 
 /// Recursive, parallel disk scanner.
 ///
-/// Directory reads are blocking syscalls, so they run on a dedicated Dispatch
-/// queue (whose pool grows when threads block) instead of the width-limited
-/// Swift cooperative pool — a scan wedged on a dead network mount can never
-/// starve the rest of the app or a subsequent scan. The tree fan-out uses a
-/// task group at the top levels; cancellation uses structured task
-/// cancellation plus a flag the IO blocks check before touching the disk.
+/// Directory reads are blocking syscalls, so they run on a bounded
+/// `OperationQueue` instead of the Swift cooperative pool. The tree fan-out
+/// uses a bounded task group at the top levels; cancellation uses structured
+/// task cancellation plus a flag the IO blocks check before touching the disk
+/// and periodically while processing large directory listings.
 struct DiskScanner: Sendable {
     let options: ScanOptions
 
     /// Levels of the tree that fan out into parallel child tasks.
     private static let parallelDepthLimit = 3
 
-    /// Blocking filesystem work happens here, not on the cooperative pool.
-    private static let ioQueue = DispatchQueue(
-        label: "com.deadwood.scan-io",
-        qos: .userInitiated,
-        attributes: .concurrent
+    /// Keep both suspended Swift tasks and blocking filesystem calls bounded.
+    private static let maxConcurrentChildTasks = min(
+        max(ProcessInfo.processInfo.activeProcessorCount, 2),
+        8
     )
+
+    /// Blocking filesystem work happens here, not on the cooperative pool.
+    private static let ioQueue: OperationQueue = {
+        let queue = OperationQueue()
+        queue.name = "com.deadwood.scan-io"
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = maxConcurrentChildTasks
+        return queue
+    }()
 
     private static let resourceKeys: [URLResourceKey] = [
         .isDirectoryKey,
@@ -66,7 +73,7 @@ struct DiskScanner: Sendable {
             rootURL: url
         )
         let children = try await scanChildren(of: url, depth: 0, tracker: tracker, flag: flag, visited: visited)
-        root.finalize(children: children.sorted { $0.size > $1.size })
+        root.finalize(children: children.sorted(by: Self.largerFirst))
 
         let (progress, skipped) = tracker.finalSnapshot()
         return ScanResult(
@@ -106,7 +113,7 @@ struct DiskScanner: Sendable {
     ) async throws -> DirectoryListing {
         let options = self.options
         return try await withCheckedThrowingContinuation { continuation in
-            Self.ioQueue.async {
+            Self.ioQueue.addOperation {
                 // A cancelled scan's queued reads must not touch the disk —
                 // especially not a dead network mount.
                 guard !flag.isSet else {
@@ -129,7 +136,14 @@ struct DiskScanner: Sendable {
                 }
 
                 listing.itemCount = contents.count
-                for itemURL in contents {
+                for (index, itemURL) in contents.enumerated() {
+                    // Attribute reads for a directory with hundreds of
+                    // thousands of entries can take noticeable time. Avoid a
+                    // lock on every item while still responding promptly.
+                    if index.isMultiple(of: 256), flag.isSet {
+                        continuation.resume(throwing: CancellationError())
+                        return
+                    }
                     guard let values = try? itemURL.resourceValues(forKeys: Self.resourceKeySet) else {
                         tracker.recordError(path: itemURL.path)
                         continue
@@ -178,6 +192,7 @@ struct DiskScanner: Sendable {
         try Task.checkCancellation()
 
         let listing = try await readDirectory(at: url, tracker: tracker, flag: flag, visited: visited)
+        try Task.checkCancellation()
         tracker.add(items: listing.itemCount, bytes: listing.fileBytes, path: url.path)
 
         var directoryNodes: [FileNode] = []
@@ -185,15 +200,27 @@ struct DiskScanner: Sendable {
 
         if depth < Self.parallelDepthLimit && listing.subdirectories.count > 1 {
             directoryNodes = try await withThrowingTaskGroup(of: FileNode.self) { group in
-                for entry in listing.subdirectories {
+                let initialTaskCount = min(
+                    Self.maxConcurrentChildTasks,
+                    listing.subdirectories.count
+                )
+                for entry in listing.subdirectories.prefix(initialTaskCount) {
                     group.addTask { [self] in
                         try await scanDirectoryNode(entry: entry, depth: depth + 1, tracker: tracker, flag: flag, visited: visited)
                     }
                 }
                 var nodes: [FileNode] = []
                 nodes.reserveCapacity(listing.subdirectories.count)
-                for try await node in group {
+                var nextEntryIndex = initialTaskCount
+                while let node = try await group.next() {
                     nodes.append(node)
+                    if nextEntryIndex < listing.subdirectories.count {
+                        let entry = listing.subdirectories[nextEntryIndex]
+                        nextEntryIndex += 1
+                        group.addTask { [self] in
+                            try await scanDirectoryNode(entry: entry, depth: depth + 1, tracker: tracker, flag: flag, visited: visited)
+                        }
+                    }
                 }
                 return nodes
             }
@@ -221,11 +248,18 @@ struct DiskScanner: Sendable {
             modified: entry.modified
         )
         let children = try await scanChildren(of: entry.url, depth: depth, tracker: tracker, flag: flag, visited: visited)
-        node.finalize(children: children.sorted { $0.size > $1.size })
+        node.finalize(children: children.sorted(by: Self.largerFirst))
         if entry.isPackage && !options.showPackageContents {
             node.collapseToLeaf()
         }
         return node
+    }
+
+    private static func largerFirst(_ lhs: FileNode, _ rhs: FileNode) -> Bool {
+        if lhs.size == rhs.size {
+            return lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
+        }
+        return lhs.size > rhs.size
     }
 
     // MARK: - Largest leaves
