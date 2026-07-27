@@ -56,22 +56,24 @@ Do not create the `v1.0.0` tag until every required item below is complete.
 - [x] Add the four public wallet addresses, exact asset/network labels, and validated QR codes.
 - [ ] Confirm ownership and receipt with a small test transfer on every network.
 - [ ] Test address copying on desktop and mobile browsers.
-- [ ] Publish the GitHub Pages site and test the in-app Donate link.
+- [x] Publish the GitHub Pages site and validate the in-app Donate URL and live
+  wallet configuration.
 
 ## Open-source repository
 
 - [x] Document features, source builds, screenshots, limitations, and the MIT license.
-- [ ] Create the public GitHub repository and add its remote.
+- [x] Create the public GitHub repository and add its remote.
 - [x] Add `CONTRIBUTING.md`, `SECURITY.md`, issue forms, and a pull request template.
-- [ ] Enable GitHub Actions, GitHub Pages, and private vulnerability reporting.
-- [ ] Configure the repository description, topics, social preview, and website URL.
+- [x] Enable GitHub Actions, GitHub Pages, and private vulnerability reporting.
+- [x] Configure the repository description, topics, and website URL.
+- [ ] Configure the repository social preview.
 - [x] Scan tracked files and the full patch history for known secret patterns.
 - [x] Rewrite existing commit metadata to use `blank` and the GitHub-provided noreply address.
 
 ## GitHub release
 
 - [x] Write `CHANGELOG.md` and the `1.0.0` release notes.
-- [ ] Merge the release commit into `main`.
+- [x] Merge the release commit into `main`.
 - [ ] Create the annotated `v1.0.0` tag from the exact tested commit.
 - [ ] Create a draft GitHub Release and attach the ad-hoc-signed DMG and SHA-256 checksum.
 - [ ] Re-download and verify the published asset before publishing the release.
